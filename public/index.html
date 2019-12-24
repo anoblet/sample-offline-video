@@ -1,0 +1,43 @@
+<head>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js").then(function() {
+        console.log("Service Worker Registered");
+      });
+    }
+  </script>
+</head>
+<video
+  id="0"
+  controls
+  poster="static/poster.jpg"
+  style="margin: 0 0 1em 0; max-width: 100%; width: 480px;"
+  crossorigin="anonymous"
+>
+  <source src="static/gbike.webm" type="video/webm" />
+  <!-- <source
+    src="https://prefetch-video-sample.storage.googleapis.com/gbike.mp4"
+    type="video/mp4"
+  /> -->
+  <p>Your browser does not support the video element.</p>
+</video>
+<button id="save" data-video-id="0">Save</button>
+<script>
+  const saveVideo = video => {
+    const posterUrl = video.poster;
+    caches.open(`video`).then(cache => {
+      const sourceUrls = [];
+      const sources = Array.from(video.querySelectorAll("source"));
+      sources.map(source => sourceUrls.push(source.src));
+      cache.addAll([posterUrl, ...sourceUrls]);
+    });
+  };
+
+  const button = document.querySelector("#save");
+  button.addEventListener("click", event => {
+    const video = document.querySelector(
+      `video[id="${event.target.dataset.videoId}"]`
+    );
+    saveVideo(video);
+  });
+</script>
